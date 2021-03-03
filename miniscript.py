@@ -20,33 +20,22 @@ You can use wget (by constructing the path based on the SRR numbers for each of 
 # initialize SRR list with all of the accession numbers listed
 SRR = ['SRR5660030', 'SRR5660033', 'SRR5660044', 'SRR5660045']
 
+path = os.getcwd()
+
 # completed this
 '''
 def inputFiles(SRR):
     # fetches the links through SRA and downloads the files
     # wget = uses the specified path (link) to download the files onto working directory
     getFiles = 'wget https://sra-downloadb.be-md.ncbi.nlm.nih.gov/sos2/sra-pub-run-11/' + SRR + '/' + SRR + '.1'
-    
+ 
     # split the SRA files into paired reads
-    # fastq-dump = uncompresses the data
-    splitFiles = 'fastq-dump -I --split-files '+ SRR + '.1'
+    splitFiles = 'fastq-dump -I --split-files ' + SRR + '.1'
     
     # os.system() = executes the command in a subshell
     os.system(getFiles)
     os.system(splitFiles)
 '''
-
-
-'''
-Problem 2
-
-First: Build a transcriptome index for HCMV (NCBI accession EF999921)
-
-Second: Extract the CDS features from the GenBank format.
-
-Third: Write the output to your log file
-                                                                                                                                                                                                                                                                                                                                                    
-'''    
 
 # initialize the log file (will be updated along the way)
 # 'a' = to append to the file and not delete everything along the way
@@ -108,52 +97,111 @@ def kallisto(SRR):
     os.system(kallisto_index)
     
     # command to run kallisto
-    run_kallisto = 'time kallisto quant -i HCMV_index.idx -o ./' + SRR + ' -b 30 -t 4 ' + SRR + '_1.fastq ' + SRR + '_2.fastq'
+    run_kallisto = 'time kallisto quant -i HCMV_index.idx -o' + path + '/results_'  + ' -b 30 -t 4 ' + SRR + '.1_1.fastq ' + SRR + '.1_2.fastq'
     os.system(run_kallisto)
+'''
 
-# create file for input into sleuth
-def input_Sleuth(SRR):
-    covFile = open('covFile.txt', 'w') # make the input file for sleuth
-    timePoint1 = '2dpi' # initialize time point 1
-    timePoint2 = '6dpi' # initialize time point 2
-    
-    # first line in file (labels)
-    covFile.write('Sample' + '\t' + 'Condition' + '\t' + 'Path' + '\n')
-    
-    # based on SRR number, write condiditon and path to output file
-    for i in SRR:
-        path = '/data/rmormando/MiniProject_RitaMormando/' + i
-        
-        if int(i[3:]) % 2 == 0: # if its even its at the first time point (2dpi)
-            # write to the file using the format    
-            covFile.write(str(i) + '\t' + timePoint1 + '\t' + str(path) + '\n')
-        
-        else: # if its odd then its at the second time point
-            # write to the file using the format
-            covFile.write(str(i) + '\t' + timePoint2 + '\t' + str(path) + '\n')
-            
-    covFile.close() # done writing to the file, close
+# run Sleuth using an R script
+def Sleuth(SRR):
+    # make the input file for sleuth
+    run_R = 'Rscript sample_covariates.R ' + SRR[0] + ' ' + SRR[1]+ ' ' + SRR[2] + ' ' + SRR[3]
+    os.system(run_R)
 
-# run sleuth in R
-# read the output and add them to the log file
-def Sleuth():
-    runSleuth = 'Rscript sleuth.R'
-    os.system(runSleuth)
-    output = open('sleuth_out.txt','r')
-    listoflines= output.readlines()
-    
-   # write to the log file the top ten sleuth hits
+    # grab and run through R script
+    run_R_again = 'Rscript Sleuth_Rscript.R' 
+    os.system(run_R_again)                                                                                                                                                                      
+    file = open('sleuth_out.txt').readlines()
+
+    # write out the top sleuth hits to the log file
     with open('MiniProject.log' ,'a') as output:
         for i in range(len(file)):
-                output.write(str(file[i]) + '\n') #print out the top sleuth hits
+                output.write(str(file[i]) + '\n') 
     output.close()
+'''
+
+
+# still wont work
+# try new sleuth function
+
+def SleuthInput(SRR):
+    #input file for sleuth
+    covFile = open('sample_covariates.txt','w+')
+    #initial line in file
+    covFile.write('sample'+ '\t' + 'condition' + '\t' + 'path' + '\n')
+    #based on SRR number, write condition and path to outnput file
+    for i in SRR:
+        path = i
+        if int(i[3:]) % 2 == 0: # this line keeps messing me up
+            covFile.write(str(i)+ '\t' + '2dpi' + '\t'+ path + '\n')
+        else:
+            covFile.write(str(i)+ '\t' + '6dpi' + '\t'+ path + '\n')
+    covFile.close()
+
+
+def Sleuth():
+    runSleuth = 'Rscript Sleuth_Rscript.R'
+    os.system(runSleuth)
+    output = open('sleuth_output.txt','r').readlines()
+    #listoflines= output.readlines()
+    #for line in listoflines:
+     #   logging.info(line)
+    for i in output:
+        log_file.write(i + 'n')
+
+
+# wont work
+
+# builds a bow tie index for HCMV
+def build_Bowtie(SRR):
+    #builds initial index using reference genome-- use transcriptome_index CDS fasta file?
+    bowtie_command = 'bowtie2-build ./EF999921.fasta EF999921_1'
+    os.system(bowtie_command)
+    
+    #maps transcriptome reads to the index we just created, generating sam file
+    #need al-conc to make fastq files in output 
+    bowtie_command2 = 'bowtie2 --quiet --no-unal --al-conc EF999921_' + SRR + '.fastq -x EF999921_1 -1 '+ SRR+ '.1_1.fastq -2 ' + SRR+ '.1_2.fastq -S EF999921_' + SRR+ '.sam'
+    #bowtie_cmd = 'bowtie2 --quiet --no-unal --al-conc BOW_'+SRR+'.fastq -x EF99992_1 -1 '+SRR+ '_1.fastq -2'+SRR+'_2.fastq -S '+SRR+ '.sam'
+    os.system(bowtie_command2)
+
+# save the mapped reads to the index
+# count the number of reads in each transcriptome before and after the bowtie mapping
+def bowtie_original(SRR, number):
+
+    bowtie_SRR1 = open('EF999921_' + SRR + '.1.fastq').readlines() # count the number of read pairs (mapped)
+    bowtie_SRR2 = open('EF999921_' + SRR + '.2.fastq').readlines() # count the number of read pairs (mapped)
+    donor = ''
+    if number == 1:
+        donor += 'Donor 1 (2dpi)' 
+    elif number == 2:
+        donor += 'Donor 1 (6dpi)'
+    elif number == 3:
+        donor += 'Donor 3 (2dpi)'
+    elif number == 4:
+        donor += 'Donor 3 (6dpi)' 
+    len_bowtie = ((len(bowtie_SRR1)+len(bowtie_SRR2))/8) # get the length of the bowtie pair
+
+    original1 = open(SRR + '.1_1.fastq').readlines() # count the number of read pairs (og)
+    original2 = open(SRR + '.1_2.fastq').readlines() # count the number of read pairs (og)
+    original = (len(original1) + len(original2))/8 # get the length of the original pair
+
+    # write out to the log file using given format
+    with open('MiniProject.log', 'a') as output:
+        output.write(donor + " had " + str(original) + ' read pairs before Bowtie2 filtering and ' + str(len_bowtie) + ' read pairs after \n')
+        output.close()
+
 
 
 # ---- ALL FUNCTION CALLS ---- #
-    
+
+number = 1
 for i in SRR:
- #   inputFiles(i)
+   # inputFiles(i)
     kallisto(i)
-    input_Sleuth(i)
+   # Sleuth(i)
+    build_Bowtie(i)
 #Transcriptome_Index()
+#Sleuth()
+    bowtie_original(i, number)
+   # SleuthInput(i)
 Sleuth()
+SleuthInput(SRR)
