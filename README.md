@@ -10,8 +10,15 @@ This repository contains Python code from an LUC Computational Biology project.
 - Bowtie2
 - SPAdes
 
+## Main Python Script
 
-## Questions:
+To run this script, copy the following line of code to clone this repository to your local machine:
+
+'''
+git clone https://github.com/rmormando/MiniProject_RitaMormando.git
+'''
+
+## Assignment Questions:
 
 1. We would like to compare HCMV transcriptomes 2- and 6-days post-infection (dpi). First, retrieve the following
 transcriptomes from two patient donors from SRA and convert to paired-end fastq files. You can use wget (by
