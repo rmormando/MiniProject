@@ -93,3 +93,7 @@ following to your log file: Subject accession, Percent identity, Alignment lengt
 alignment in query, Start of alignment in subject, End of alignment in subject, Bit score, E-value, and Subject Title.
 Include the following header row in the log file, followed by the top 10 hits, and tab-delimit each item:
 sacc pident length qstart qend sstart send bitscore evalue stitle 
+
+
+## Author
+Rita Mormando
