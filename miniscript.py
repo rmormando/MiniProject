@@ -1,5 +1,6 @@
 # import all of the packages
 import os
+import csv
 #import system
 #import argparse
 from Bio import SeqIO
@@ -88,7 +89,8 @@ def Transcriptome_Index():
     log_file.close() # done writing to the file so close
 '''
 
-
+# completed
+'''
 # run kallisto with the SRR numbers and files
 def kallisto(SRR):
     
@@ -99,7 +101,7 @@ def kallisto(SRR):
     # command to run kallisto
     run_kallisto = 'time kallisto quant -i HCMV_index.idx -o' + path + '/results_'  + ' -b 30 -t 4 ' + SRR + '.1_1.fastq ' + SRR + '.1_2.fastq'
     os.system(run_kallisto)
-'''
+
 
 # run Sleuth using an R script
 def Sleuth(SRR):
@@ -119,7 +121,8 @@ def Sleuth(SRR):
     output.close()
 '''
 
-
+'''
+# COMPLETED
 # still wont work
 # try new sleuth function
 
@@ -148,7 +151,7 @@ def Sleuth():
     for i in output:
         log_file.write(i + 'n')
 
-
+# COMPLETED
 # wont work
 
 # builds a bow tie index for HCMV
@@ -189,19 +192,124 @@ def bowtie_original(SRR, number):
         output.write(donor + " had " + str(original) + ' read pairs before Bowtie2 filtering and ' + str(len_bowtie) + ' read pairs after \n')
         output.close()
 
+# WORKS!!
+
+def Spades(SRR1, SRR2, SRR3, SRR4): #use only assembler to make Spades a lot shorter
+    spades_command = 'spades -k 55,77,99,127 --only-assembler -t 2 --pe1-1 EF999921_'+ SRR1 + '.1.fastq --pe1-2 EF999921_'+ SRR1 + '.2.fastq --pe2-1 EF999921_'+ SRR2 + '.1.fastq --pe2-2 EF999921_' + SRR2 + '.2.fastq --pe3-1 EF999921_' + SRR3 + '.1.fastq --pe3-2 EF999921_' + SRR3 +'.2.fastq --pe4-1 EF999921_' + SRR4 + '.1.fastq --pe4-2 EF999921_' + SRR4 + '.2.fastq -o Spades/'    
+    with open('MiniProject.log','a') as output: #run SPades and print out the command to MiniProject.log
+        output.write(spades_command + '\n')
+        output.close()
+    os.system(spades_command)
+
+'''
+
+
+# count the number of contigs that are greater than 1000 bp
+def count_Contigs():
+    newFile = open('ContigsNum.fasta', 'w') # open up new file
+    track = 0 # initialize the tracking variable to 0
+    
+    inFile = SeqIO.parse('./Spades/contigs.fasta', 'fasta') # parse out SPAdes output as a FASTA file
+    #if the sequence len is greater than 1000 add to count
+    #Add sequences greater than 1000 to outfile
+    for record in inFile:
+        len_seq = len(record.seq) # get the length of each sequence
+        
+        if len_seq > 1000: # if the sequence lenfth is greater than 1000...
+            
+            track += 1 # track that seqeunce add to the counter
+            
+            newFile.write('> '+ str(record.id) + '\n' + str(record.seq) + '\n') # add the record ID and sequence of that element to the file
+    
+    newFile.close() # only one condition to write to the file, so close after the end of the loop
+    
+    log_file.write('There are ' + str(track) + ' contigs > 1000 bp in the assembly.' + '\n') # write out to the log file
+
+# gets the sum of the total amount of base pairs in the assembly
+def length_Contigs():
+    contig_file = SeqIO.parse('ContigsNum.fasta', 'fasta') # parse through the file that contains all of the sequences greater than 1000, write as FASTA
+    total_Len = [] # initialize empty list for the total length
+    #add each sequence len to a list
+    
+    for record in contig_file: # for all in the file...
+        
+        seq_len = len(record.seq) # collect all of their individual lengths
+        
+        total_Len.append(int(seq_len)) # add those lengths, as ints, to the list
+    #sum the list
+    total = sum(total_Len) # get the sum of all of those lengths
+   
+    log_file.write('There are ' + str(total) + ' bp in the assembly.' + '\n') # write out the total length (in bp) to the log file 
+
+# function to get the longest contig from the SPAdes assembly
+# SPAdes orders the sequences in order from longest to shortest when assembled
+def longest_Contig():
+    long_count = next(SeqIO.parse('ContigsNum.fasta', 'fasta')) # next only pulls out the first sequence in a FASTA file
+    longest = open('longest_contig.fasta', 'w') # make a new file to store the longest contig
+    SeqIO.write(long_count, longest, 'fasta') # write to the file
+
+
+# run through BLAST commands and CSV results
+def blast():
+    
+    # make a databse locally to BLAST against
+    blast_cmd = 'makeblastdb -in Beta_seqs.fasta -out Betaherpesvirinae_db -title Betaherpesvirinae_db -dbtype nucl'
+    os.system(blast_cmd)
+    
+    # blasting from python, make the file a csv file
+    # 10 = makes it tab delimited
+    another_blast_cmd = 'blastn -query longest_contig.fasta -db Betaherpesvirinae_db -out myBlastResults.csv -outfmt "10 sacc pident length qstart qend sstart send bitscore evalue stitle"'
+    os.system(another_blast_cmd)
+    
+    headers = ['sacc', 'pident', 'length', 'qstart', 'qend', 'sstart', 'send', 'bitscore', 'evalue', 'stitle'] # list with labels for each column
+    blast_results = open('myBlastResults.csv','r') # open the blast results from the previous commands
+    rows = csv.DictReader('myBlastResults.csv', headers, delimiter=',') # read through CSV and create a dictionary with rows
+    track = 0 # tracker to go through the number of hits    
+
+    with open('MiniProject.log', 'a') as output:
+    
+        for row in rows:
+            
+            if track >= 9: # only include top ten hits
+                break
+            else:
+                row1 = str(row['sacc'])
+                row2 = str(row['pident'])
+                row3 = str(row['length'])
+                row4 = str(row['qstart'])
+                row5 = str(row['qend'])
+                row6 = str(row['sstart'])
+                row7 = str(row['send'])
+                row8 = str(row['bitscore'])
+                row9 = str(row['evalue'])
+                row10 = str(row['stitle'])
+                output.write(row1 + '\t' + row2 + '\t' + row3 + '\t' + row4 + '\t' + row5 + '\t' + row6 + '\t' + row7 + '\t' + row8 + '\t' + row9 + '\t' + row10)
+
+    log_output = open('MiniProject.log', 'a') # open the log file to write to
+    log_output.write('sacc' + '\t' + 'pident' + '\t' + 'length' + '\t' + 'qstart' + '\t' + 'qend' + '\t' + 'sstart' + '\t' + 'send' + '\t' + 'bitscore' + '\t' + 'evalue' + '\t' + 'stitle') # write out the header row to the log file
+    blast_results.close() # wrote everything so close the file
+        
+    output.close() # everything has been written to the file so close
 
 
 # ---- ALL FUNCTION CALLS ---- #
 
-number = 1
-for i in SRR:
+#number = 1
+#for i in SRR:
    # inputFiles(i)
-    kallisto(i)
+   # kallisto(i)
    # Sleuth(i)
-    build_Bowtie(i)
+   # build_Bowtie(i)
 #Transcriptome_Index()
 #Sleuth()
-    bowtie_original(i, number)
+   # bowtie_original(i, number)
    # SleuthInput(i)
-Sleuth()
-SleuthInput(SRR)
+   # number += 1
+#Sleuth()
+#SleuthInput(SRR)
+#Spades(SRR[0], SRR[1], SRR[2], SRR[3])
+count_Contigs()
+length_Contigs()
+#allLarge_Contigs()
+blast()
+longest_Contig()
