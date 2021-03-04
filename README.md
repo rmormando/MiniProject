@@ -1,8 +1,8 @@
 # Computational Biology 483 - Mini Project 
 
-This repository contains Python code from an LUC Computational Biology project. Project focuses on .
+This repository contains Python code from an LUC Computational Biology project.
 
-Software Requirements
+##Software Requirements
 Linux/Unix
 Python3
 Biopython
@@ -11,7 +11,7 @@ Bowtie2
 SPAdes
 
 
-Questions:
+##Questions:
 
 1. We would like to compare HCMV transcriptomes 2- and 6-days post-infection (dpi). First, retrieve the following
 transcriptomes from two patient donors from SRA and convert to paired-end fastq files. You can use wget (by
@@ -23,8 +23,7 @@ Donor 3 (6dpi): https://www.ncbi.nlm.nih.gov/sra/SRX2896375
 
 2. We will quantify TPM in each sample using kallisto, but first we need to build a transcriptome index for HCMV (NCBI
 accession EF999921). Use Biopython to retrieve and generate the appropriate input and then build the index with
-kallisto. You will need to extract the CDS features from the GenBank format. Write the following to your log file (replace
-# with the number of coding sequences in the HCMV genome):
+kallisto. You will need to extract the CDS features from the GenBank format. Write the following to your log file (replace # with the number of coding sequences in the HCMV genome):
 The HCMV genome (EF999921) has # CDS.
 
 3. Quantify the TPM of each CDS in each transcriptome using kallisto and use these results as input to find differentially
