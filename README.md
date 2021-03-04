@@ -3,12 +3,12 @@
 This repository contains Python code from an LUC Computational Biology project.
 
 ## Software Requirements
-Linux/Unix
-Python3
-Biopython
-Kallisto
-Bowtie2
-SPAdes
+- Linux/Unix
+- Python3
+- Biopython
+- Kallisto
+- Bowtie2
+- SPAdes
 
 
 ## Questions:
