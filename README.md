@@ -24,10 +24,16 @@ Then use this line to run through the python script:
 python3 final_minicode.py
 ```
 
+## Using the Test Data
+
+If you want to run through this program quickly use the test samples that are included on this repository.
+
+The test samples contain the first 10000 lines of the paired-end fastq files.
+
 
 #### Files included in Repo
 
-- mini_project.py
+- final_minicode.py
 
 > the whole pipeline which is composed of multiple functions that give each outputs
 
@@ -35,13 +41,14 @@ python3 final_minicode.py
 
 > R script which outputs a text while which identifies the diffrence between 2 timepoints in the expressed genes
 
-- sequences.fa
+- Beta_seqs.fasta
 
 > nucleotide database out of all RefSeq sequences of the Betaherpesvirinae found on 3/4/2021
 
+
 #### Important Output Files
 
-- miniProject.log
+- MiniProject.log
 > a log file that has information from the data ran with the script
 
 - HCMV_index.idx
@@ -49,6 +56,9 @@ python3 final_minicode.py
 
 - EF999921_CDS.fasta
 > fasta file with CDS of EF999921
+
+- myBlastResults.csv
+> csv file that has contains the results after run through BLAST
 
 
 ## Assignment Questions:
