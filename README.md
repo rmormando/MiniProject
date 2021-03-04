@@ -18,6 +18,32 @@ To run this script, copy the following line of code to clone this repository to 
 git clone https://github.com/rmormando/MiniProject_RitaMormando.git
 ```
 
+#### Files included in Repo
+
+- mini_project.py
+
+> the whole pipeline which is composed of multiple functions that give each outputs
+
+- Sleuth_Rscript.R
+
+> R script which outputs a text while which identifies the diffrence between 2 timepoints in the expressed genes
+
+- sequences.fa
+
+> nucleotide database out of all RefSeq sequences of the Betaherpesvirinae found on 3/4/2021
+
+#### Important Output Files
+
+- miniProject.log
+> a log file that has information from the data ran with the script
+
+- HCMV_index.idx
+> index created to be used by kallisto
+
+- EF999921_CDS.fasta
+> fasta file with CDS of EF999921
+
+
 ## Assignment Questions:
 
 1. We would like to compare HCMV transcriptomes 2- and 6-days post-infection (dpi). First, retrieve the following
