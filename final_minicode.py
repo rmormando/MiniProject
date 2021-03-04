@@ -1,21 +1,8 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Thu Mar  4 15:56:20 2021
-
-@author: r2mor
-"""
-
 # import all of the packages
 import os
 import csv
-#import system
-#import argparse
 from Bio import SeqIO
 from Bio import Entrez
-from Bio import SearchIO
-from Bio.Blast import NCBIWWW
-from Bio.Seq import Seq
-
 
 '''
 Problem 1
