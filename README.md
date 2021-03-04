@@ -12,11 +12,18 @@ This repository contains Python code from an LUC Computational Biology project.
 
 ## Main Python Script
 
-To run this script, copy the following line of code to clone this repository to your local machine:
+To run this script, first copy the following line of code to clone this repository to your local machine:
 
 ```
 git clone https://github.com/rmormando/MiniProject_RitaMormando.git
 ```
+
+Then use this line to run through the python script:
+
+```
+python3 final_minicode.py
+```
+
 
 #### Files included in Repo
 
