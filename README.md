@@ -97,4 +97,5 @@ sacc pident length qstart qend sstart send bitscore evalue stitle
 
 ## Author
 Rita Mormando
+
 Bioinformatics Program, Loyola University Chicago
