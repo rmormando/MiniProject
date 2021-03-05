@@ -2,6 +2,7 @@
 
 This repository contains Python code from an LUC Computational Biology project.
 
+
 ## Software Requirements
 - Linux/Unix
 - Python3
@@ -10,16 +11,19 @@ This repository contains Python code from an LUC Computational Biology project.
 - Bowtie2
 - SPAdes
 
+
 ## Packages Imported for Python
 - os
 - csv
 - BioPython (Entrez and SeqIO)
 
+
 ## Packages Imported for R
 - sleuth
 - dplyr
 
-## Main Python Script
+
+## Run the Pipeline:
 
 To run this script, first copy the following line of code to clone this repository to your local machine:
 
@@ -33,14 +37,21 @@ Then use this line to run through the python script:
 python3 final_minicode.py
 ```
 
-## Using the Test Data
+
+## Installation Location:
+```
+https://github.com/rmormando/MiniProject_RitaMormando.git
+```
+
+
+## Using the Test Data:
 
 You can run through the script using the given SRR files included in the python code. However, if you want to save time and run through this program quickly use the test samples that are included on this repository.
 
 The test samples contain the first 10000 lines of the paired-end fastq files.
 
 
-#### Files included in Repo
+## Files included in Repo:
 
 - final_minicode.py
 > the whole pipeline which is composed of multiple functions that give each outputs
