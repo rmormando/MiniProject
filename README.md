@@ -57,19 +57,27 @@ The test samples contain the first 10000 lines of the paired-end fastq files.
 > the whole pipeline which is composed of multiple functions that give each outputs
 
 - Sleuth_Rscript.R
-> R script which outputs a text while which identifies the diffrence between 2 timepoints in the expressed genes
+> R script which outputs a text file which identifies the diffrence between 2 timepoints in the expressed genes
 
 - MiniProject.log
-> a log file that has information from the data ran with the script
+> a log file that has all of the information from the data ran with the script
+
+###### Output Files included in Repo:
 
 - HCMV_index.idx
 > index created to be used by kallisto
 
 - EF999921_CDS.fasta
-> fasta file with CDS of EF999921
+> FASTA file with CDS of EF999921
 
 - myBlastResults.csv
-> csv file that has contains the results after run through BLAST
+> CSV file that has contains the results after run through BLAST
+
+- longest_contig.fasta
+> FASTA file that contains the longest contig found while running SPAdes
+
+- out_sleuth.txt
+> TXT file used by R and then written to the log file
 
 
 ## Assignment Questions:
