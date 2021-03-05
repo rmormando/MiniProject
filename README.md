@@ -13,10 +13,7 @@ This repository contains Python code from an LUC Computational Biology project.
 ## Packages Imported for Python
 - os
 - csv
-- BioPython
-> Entrez 
->
-> SeqIO
+- BioPython (Entrez and SeqIO)
 
 ## Packages Imported for R
 - sleuth
