@@ -14,7 +14,8 @@ This repository contains Python code from an LUC Computational Biology project.
 - os
 - csv
 - BioPython
-> Entrez
+> Entrez 
+>
 > SeqIO
 
 ## Packages Imported for R
