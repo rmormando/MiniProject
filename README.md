@@ -10,6 +10,17 @@ This repository contains Python code from an LUC Computational Biology project.
 - Bowtie2
 - SPAdes
 
+## Packages Imported for Python
+- os
+- csv
+- BioPython
+> Entrez
+> SeqIO
+
+## Packages Imported for R
+- sleuth
+- dplyr
+
 ## Main Python Script
 
 To run this script, first copy the following line of code to clone this repository to your local machine:
@@ -26,7 +37,7 @@ python3 final_minicode.py
 
 ## Using the Test Data
 
-If you want to run through this program quickly use the test samples that are included on this repository.
+You can run through the script using the given SRR files included in the python code. However, if you want to save time and run through this program quickly use the test samples that are included on this repository.
 
 The test samples contain the first 10000 lines of the paired-end fastq files.
 
@@ -34,19 +45,10 @@ The test samples contain the first 10000 lines of the paired-end fastq files.
 #### Files included in Repo
 
 - final_minicode.py
-
 > the whole pipeline which is composed of multiple functions that give each outputs
 
 - Sleuth_Rscript.R
-
 > R script which outputs a text while which identifies the diffrence between 2 timepoints in the expressed genes
-
-- Beta_seqs.fasta
-
-> nucleotide database out of all RefSeq sequences of the Betaherpesvirinae found on 3/4/2021
-
-
-#### Important Output Files
 
 - MiniProject.log
 > a log file that has information from the data ran with the script
