@@ -62,7 +62,8 @@ The test samples contain the first 10000 lines of the paired-end fastq files.
 - MiniProject.log
 > a log file that has all of the information from the data ran with the script
 
-###### Output Files included in Repo:
+
+#### Output Files included in Repo:
 
 - HCMV_index.idx
 > index created to be used by kallisto
