@@ -1,8 +1,10 @@
 # import all of the packages
 import os
 import csv
+
 from Bio import SeqIO
 from Bio import Entrez
+
 
 '''
 Problem 1
@@ -113,7 +115,7 @@ def kallisto(SRR):
     os.system(kallisto_index)
     
     # command to run kallisto
-    run_kallisto = 'time kallisto quant -i HCMV_index.idx -o' + path + '/results_'  + ' -b 30 -t 4 ' + SRR + '.1_1.fastq ' + SRR + '.1_2.fastq'
+    run_kallisto = 'time kallisto quant -i HCMV_index.idx -o' + path + '/results_' + SRR + ' -b 30 -t 4 ' + SRR + '.1_1.fastq ' + SRR + '.1_2.fastq'
     os.system(run_kallisto)
 
 # code to make sleuth input file
@@ -125,7 +127,7 @@ def SleuthInput(SRR):
     #based on SRR number, write condition and path to outnput file
     for i in SRR:
         paths = path + '/' + 'results_' + i
-        print(paths)
+        #print(paths)
         if int(i[3:]) % 2 == 0: # if its even, 2dpi
             covFile.write(str(i)+ '\t' + '2dpi' + '\t'+ paths + '\n')
         else: # if its odd, 6dpi
@@ -136,7 +138,7 @@ def SleuthInput(SRR):
 def Sleuth():
     runSleuth = 'Rscript Sleuth_Rscript.R'
     os.system(runSleuth)
-    output = open('sleuth_out.txt','r').readlines()
+    output = open('out_sleuth.txt','r').readlines()
     for i in output:
         log_file.write(i + '\n')
 
@@ -160,7 +162,7 @@ def build_Bowtie(SRR):
     
     #maps transcriptome reads to the index we just created, generating sam file
     #need al-conc to make fastq files in output 
-    bowtie_command2 = 'bowtie2 --quiet --no-unal --al-conc EF999921_' + SRR + '.fastq -x EF999921_1 -1 '+ SRR+ '.1_1.fastq -2 ' + SRR+ '.1_2.fastq -S EF999921_' + SRR+ '.sam'
+    bowtie_command2 = 'bowtie2 --quiet --no-unal --al-conc EF999921_' + SRR + '.fastq -x EF999921_1 -1 ' + SRR + '.1_1.fastq -2 ' + SRR + '.1_2.fastq -S EF999921_' + SRR + '.sam'
     #bowtie_cmd = 'bowtie2 --quiet --no-unal --al-conc BOW_'+SRR+'.fastq -x EF99992_1 -1 '+SRR+ '_1.fastq -2'+SRR+'_2.fastq -S '+SRR+ '.sam'
     os.system(bowtie_command2)
 
@@ -282,47 +284,43 @@ def longest_Contig():
     longest = open('longest_contig.fasta', 'w') # make a new file to store the longest contig
     SeqIO.write(long_count, longest, 'fasta') # write to the file
 
+# split into three separate functions (database call, blast call, and blast parse)
+# function to make the blast local database
+def blast_db():
+    os.system("makeblastdb -in Beta_seqs.fasta -out Betaherpesvirinae_db -title Betaherpesvirinae_db -dbtype nucl")
 
-# run through BLAST commands and CSV results
+# function to call blast command with tab delimiters (the 10)
 def blast():
-    
-    # make a databse locally to BLAST against
-    blast_cmd = 'makeblastdb -in Beta_seqs.fasta -out Betaherpesvirinae_db -title Betaherpesvirinae_db -dbtype nucl'
-    os.system(blast_cmd)
-    
-    # blasting from python, make the file a csv file
-    # 10 = makes it tab delimited
-    another_blast_cmd = 'blastn -query longest_contig.fasta -db Betaherpesvirinae_db -out myBlastResults.csv -outfmt "10 sacc pident length qstart qend sstart send bitscore evalue stitle"'
-    os.system(another_blast_cmd)
-    
-    headers = ['sacc', 'pident', 'length', 'qstart', 'qend', 'sstart', 'send', 'bitscore', 'evalue', 'stitle'] # list with labels for each column
-    blast_results = open('myBlastResults.csv','r') # open the blast results from the previous commands
-    rows = csv.DictReader(blast_results, headers, delimiter=',') # read through CSV and create a dictionary with rows
-    track = 0 # tracker to go through the number of hits    
-   # log_file.write('sacc' + '\t' + 'pident' + '\t' + 'length' + '\t' + 'qstart' + '\t' + 'qend' + '\t' + 'sstart' + '\t' + 'send' + '\t' + 'bitscore' + '\t' + 'evalue' + '\t' + 'stitle') # write out the header row to the log file
- 
-    with open('MiniProject.log', 'a') as output:
-        for row in rows:
-            
-            if track >= 9: # only include top ten hits
+    os.system('blastn -query longest_contig.fasta -db Betaherpesvirinae_db -out myBlastResults.csv -outfmt "10 sacc pident length qstart qend sstart send bitscore evalue stitle"')
+
+# parse through the csv file and pull out the top 10 hits and write them to the log file
+def blast_parse():
+    headers = ["sacc", "pident", "length", "qstart", "qend", "sstart", "send", "bitscore", "evalue", "stitle"] # top line in file
+    log_file.write('sacc' + '\t' + 'pident' + '\t' + 'length' + '\t' + 'qstart' + '\t' + 'qend' + '\t' + 'sstart' + '\t' + 'send' + '\t' + 'bitscore' + '\t' + 'evalue' + '\t' + 'stitle') # write out the header row to the log file
+    blast_results = open("BLAST_results.csv", "r") # open the csv file
+    csv_rows = csv.DictReader(blast_results, headers, delimiter = ",") # read in each row of the csv file as dictionary
+    track = 0 # tracker for number of hits
+    with open("MiniProject.log", "a") as out: # add top 10 hits to the log file
+        for row in csv_rows:
+            if track >= 9: #count used to get only top 10 hits
                 break
             else:
-                row1 = str(row['sacc'])
-                row2 = str(row['pident'])
-                row3 = str(row['length'])
-                row4 = str(row['qstart'])
-                row5 = str(row['qend'])
-                row6 = str(row['sstart'])
-                row7 = str(row['send'])
-                row8 = str(row['bitscore'])
-                row9 = str(row['evalue'])
-                row10 = str(row['stitle'])
-                output.write(row1 + '\t' + row2 + '\t' + row3 + '\t' + row4 + '\t' + row5 + '\t' + row6 + '\t' + row7 + '\t' + row8 + '\t' + row9 + '\t' + row10 + '\n')
-        track += 1
-    blast_results.close() # wrote everything so close the file
-        
-    output.close() # everything has been written to the file so close
+                # pull out values for each key 
+                out1 = str(row["sacc"]) # subject accession
+                out2 = str(row["pident"]) # percent identity
+                out3 = str(row["length"]) # alignment length
+                out4 = str(row["qstart"]) # start of alignment in query
+                out5 = str(row["qend"]) # end of alignment in query
+                out6 = str(row["sstart"]) # start of alignment in subject
+                out7 = str(row["send"]) # end of alignment in subject
+                out8 = str(row["bitscore"]) # bitscore
+                out9 = str(row["evalue"]) # evalue
+                out10 = str(row["stitle"]) # subject title
+                out.write(out1 + "\t" + out2 + "\t" +  out3 + "\t" +  out4 + "\t" +  out5 + "\t" +  out6 + "\t" +  out7 + "\t" +  out8 + "\t" +  out9 + "\t" +  out10 + "\n") # then write out all of the data found in tab delimited format to the out file
+            track += 1 # track and make sure only getting top ten hits
 
+            
+            
 # ---- ALL FUNCTION CALLS ---- #
 
 number = 1
@@ -330,18 +328,17 @@ number = 1
 for i in SRR: # for all of the functions that are using the given SRR values
    inputFiles(i)
    kallisto(i)
-   SleuthInput(i)
    build_Bowtie(i)
    bowtie_original(i, number)
-   SleuthInput(i)
    number += 1
    
 Transcriptome_Index()
 Sleuth()
-#SleuthInput(SRR)
+SleuthInput(SRR)
 Spades(SRR[0], SRR[1], SRR[2], SRR[3])
 count_Contigs()
 length_Contigs()
 longest_Contig()
+blast_db()
 blast()
-#log_file.close()
+blast_parse()
