@@ -81,6 +81,13 @@ The test samples contain the first 10000 lines of the paired-end fastq files.
 > TXT file used by R and then written to the log file
 
 
+You will also need to download all of the sequences from NCBI's nucleotide database for the entire Betaherpesvirinae subfamily. This file is about 151MB long (too large to include in the repo) but is necessary for BLAST to work.
+
+You can follow this link (https://www.ncbi.nlm.nih.gov/nuccore/?term=txid10357%5BOrganism%3Aexp%5D) or search this (txid10357[Organism:exp]) in the nucleotide database to bring you to NCBI's entire collection of Betaherpesvirinae sumbfamily sequences. 
+
+You can download them all by clicking on the 'Send To' link and select for these parameters which will be necessary for the code to function correctly: Complete Record, File, FASTA, Sequence Length
+
+
 ## Assignment Questions:
 
 1. We would like to compare HCMV transcriptomes 2- and 6-days post-infection (dpi). First, retrieve the following
